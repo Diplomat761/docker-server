@@ -1,0 +1,30 @@
+services:
+  ubuntu:
+    build:
+      target: ubuntu_dev
+    restart: "unless-stopped"
+    volumes:
+      - "./php/95-xdebug.ini:/etc/php/8.2/apache2/conf.d/95-xdebug.ini"
+      - "./php/95-xdebug.ini:/etc/php/8.2/cli/conf.d/95-xdebug.ini"
+      - "./php/95-develop.ini:/etc/php/8.2/apache2/conf.d/95-develop.ini"
+      - "./php/95-develop.ini:/etc/php/8.2/cli/conf.d/95-develop.ini"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  mailhog:
+    image: mailhog/mailhog
+    restart: "unless-stopped"
+    ports:
+      - '8025:8025'
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: "no"
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "${PHPMYADMIN_PORT}:80"
+    volumes:
+      - "./phpmyadmin/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini"
+      - "/etc/localtime:/etc/localtime:ro"
